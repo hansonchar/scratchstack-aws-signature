@@ -27,6 +27,6 @@ scratchstack-aws-principal = { version = "^0.3", features = ["service"] }
 tower = { version = "0.4", features = [ "util" ] }
 
 [dev-dependencies]
-env_logger = "^0.8"
+env_logger = "^0.9"
 tokio = { version = "^1.4", features = [ "macros", "rt" ] }
-test-env-log = "0.2"
+test-log = "0.2"
