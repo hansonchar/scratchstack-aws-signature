@@ -368,7 +368,7 @@ impl SigningKey {
                 let k_region = self.to_kregion_key(&req_date, &region);
                 println!("try_to_kservice_key:: req_date: {}, region: {}, service: {}", req_date, region.as_ref(), service.as_ref());
                 let hmac = hmac_sha256(&k_region.key, service.as_ref().as_bytes()).as_ref().to_vec();
-                println!("try_to_kservice_key:: req_date: {}", hex::encode(&hmac));
+                println!("try_to_kservice_key:: req_date: 0x{}", hex::encode(&hmac));
                 Ok(Self {
                     kind: SigningKeyKind::KService,
                     key: hmac,
@@ -395,7 +395,7 @@ impl SigningKey {
                     kind: SigningKeyKind::KRegion,
                     key: {
                         let kregion_key = hmac_sha256(&k_date.key, region.as_ref().as_bytes()).as_ref().to_vec();
-                        println!("try_to_kregion_key::kregion_key: {}", hex::encode(&kregion_key));
+                        println!("try_to_kregion_key::kregion_key: 0x{}", hex::encode(&kregion_key));
                         kregion_key
                     },
                 })
@@ -420,14 +420,19 @@ impl SigningKey {
                 let ymd = format!("{}", req_date.format("%Y%m%d"));
                 let k_secret_str = match from_utf8(&self.key) {
                     Ok(s) => {
-                        println!("try_to_kdate_key::k_secret_str: {}", s);
+                        println!("try_to_kdate_key:: k_secret_str: {}", s);
                         s
                     },
                     Err(_) => return Err(SignatureError::InvalidSecretKey),
                 };
                 Ok(SigningKey {
                     kind: SigningKeyKind::KDate,
-                    key: hmac_sha256(format!("AWS4{}", k_secret_str).as_bytes(), ymd.as_bytes()).as_ref().to_vec(),
+                    key: {
+                        println!("try_to_kdate_key:: ymd: {}", ymd);
+                        let kdate_key = hmac_sha256(format!("AWS4{}", k_secret_str).as_bytes(), ymd.as_bytes()).as_ref().to_vec();
+                        println!("try_to_kdate_key:: kdate_key: 0x{}", hex::encode(&kdate_key));
+                        kdate_key
+                    },
                 })
             }
 
@@ -468,7 +473,7 @@ impl SigningKey {
                     kind: SigningKeyKind::KSigning,
                     key: {
                         let ksigning_key = hmac_sha256(&k_service.key, AWS4_REQUEST.as_bytes()).as_ref().to_vec();
-                        println!("to_ksigning_key:: ksigning_key: {}", hex::encode(&ksigning_key));
+                        println!("to_ksigning_key:: ksigning_key: 0x{}", hex::encode(&ksigning_key));
                         ksigning_key
                     },
                 }
