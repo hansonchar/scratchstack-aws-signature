@@ -466,7 +466,11 @@ impl SigningKey {
                 let k_service = self.to_kservice_key(&req_date, &region, &service);
                 Self {
                     kind: SigningKeyKind::KSigning,
-                    key: hmac_sha256(&k_service.key, AWS4_REQUEST.as_bytes()).as_ref().to_vec(),
+                    key: {
+                        let ksigning_key = hmac_sha256(&k_service.key, AWS4_REQUEST.as_bytes()).as_ref().to_vec();
+                        println!("to_ksigning_key:: ksigning_key: {}", hex::encode(&ksigning_key));
+                        ksigning_key
+                    },
                 }
             }
         }
