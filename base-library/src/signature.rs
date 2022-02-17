@@ -367,11 +367,11 @@ impl SigningKey {
             SigningKeyKind::KRegion | SigningKeyKind::KDate | SigningKeyKind::KSecret => {
                 let k_region = self.to_kregion_key(&req_date, &region);
                 println!("try_to_kservice_key:: req_date: {}, region: {}, service: {}", req_date, region.as_ref(), service.as_ref());
-                let hmac = hmac_sha256(&k_region.key, service.as_ref().as_bytes()).as_ref().to_vec();
-                println!("try_to_kservice_key:: req_date: 0x{}", hex::encode(&hmac));
+                let kservice_key = hmac_sha256(&k_region.key, service.as_ref().as_bytes()).as_ref().to_vec();
+                println!("try_to_kservice_key:: hmac: 0x{}", hex::encode(&kservice_key));
                 Ok(Self {
                     kind: SigningKeyKind::KService,
-                    key: hmac,
+                    key: kservice_key,
                 })
             }
             _ => Err(SignatureError::InvalidSigningKeyKind {
