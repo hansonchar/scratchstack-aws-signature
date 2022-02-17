@@ -366,9 +366,12 @@ impl SigningKey {
             SigningKeyKind::KService => Ok(self.clone()),
             SigningKeyKind::KRegion | SigningKeyKind::KDate | SigningKeyKind::KSecret => {
                 let k_region = self.to_kregion_key(&req_date, &region);
+                println!("try_to_kservice_key:: req_date: {}, region: {}, service: {}", req_date, region.as_ref(), service.as_ref());
+                let hmac = hmac_sha256(&k_region.key, service.as_ref().as_bytes()).as_ref().to_vec();
+                println!("try_to_kservice_key:: req_date: {}", hex::encode(&hmac));
                 Ok(Self {
                     kind: SigningKeyKind::KService,
-                    key: hmac_sha256(&k_region.key, service.as_ref().as_bytes()).as_ref().to_vec(),
+                    key: hmac,
                 })
             }
             _ => Err(SignatureError::InvalidSigningKeyKind {
@@ -390,7 +393,11 @@ impl SigningKey {
                 let k_date = self.to_kdate_key(req_date);
                 Ok(Self {
                     kind: SigningKeyKind::KRegion,
-                    key: hmac_sha256(&k_date.key, region.as_ref().as_bytes()).as_ref().to_vec(),
+                    key: {
+                        let kregion_key = hmac_sha256(&k_date.key, region.as_ref().as_bytes()).as_ref().to_vec();
+                        println!("try_to_kregion_key::kregion_key: {}", hex::encode(&kregion_key));
+                        kregion_key
+                    },
                 })
             }
             _ => Err(SignatureError::InvalidSigningKeyKind {
@@ -412,7 +419,10 @@ impl SigningKey {
             SigningKeyKind::KSecret => {
                 let ymd = format!("{}", req_date.format("%Y%m%d"));
                 let k_secret_str = match from_utf8(&self.key) {
-                    Ok(s) => s,
+                    Ok(s) => {
+                        println!("try_to_kdate_key::k_secret_str: {}", s);
+                        s
+                    },
                     Err(_) => return Err(SignatureError::InvalidSecretKey),
                 };
                 Ok(SigningKey {
