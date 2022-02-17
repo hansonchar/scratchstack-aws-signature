@@ -506,6 +506,7 @@ impl SigningKey {
 /// additional data (e.g. a database connection) to look up a key, use this to implement a struct.
 pub trait GetSigningKey {}
 
+#[derive(Debug)]
 pub struct GetSigningKeyRequest {
     pub signing_key_kind: SigningKeyKind,
     pub access_key: String,
