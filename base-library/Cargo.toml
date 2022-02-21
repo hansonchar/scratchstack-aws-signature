@@ -23,7 +23,8 @@ lazy_static = "^1.4.0"
 log = "^0.4"
 regex = "^1.3"
 ring = "^0.16"
-scratchstack-aws-principal = { version = "^0.3", features = ["service"] }
+# scratchstack-aws-principal = { version = "^0.3", features = ["service"] }
+scratchstack-aws-principal = { git = "https://github.com/hansonchar/scratchstack-aws-principal", branch = "main-hchar", features = ["service"]}
 tower = { version = "0.4", features = [ "util" ] }
 
 [dev-dependencies]
